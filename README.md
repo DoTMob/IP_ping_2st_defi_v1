@@ -1,23 +1,35 @@
-# LatencyScope
+# SLICEisScope
 
-**Browser-based HTTP round-trip latency tester with real-time statistics and CSV export.**
+**Browser-based HTTP round-trip latency tester with real-time statistics, percentiles, and CSV export.**
 
 Measure the time it takes a browser to fetch a remote resource, watch the
 latency curve update live, and export every sample as CSV — no server, no
 build step, no dependencies beyond a browser and a CDN.
 
-**Maintained by [`D0T_SL_CE"I_"`](https://github.com/)**
+**Maintained by [`SL_CE'I_`](https://github.com/DoTMob/)**
+
+> *SL_CE'I_ → SLICE'IS → "Slice is" → **Internet Security**, by design.*
+> The two letters hidden behind the underscores spell **IS**.
 
 [![Version](https://img.shields.io/badge/version-3.0.0-blue.svg)](#changelog)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](#license)
 [![Client](https://img.shields.io/badge/client-vanilla%20JS-f7df1e.svg)](#requirements)
-[![Author](https://img.shields.io/badge/author-SL__CE%22I__%22-8957e5.svg)](#)
+[![Author](https://img.shields.io/badge/author-SL__CE%27I__%27-8957e5.svg)](https://github.com/DoTMob/)
+
+> ### ⚠️ Measurement tool, not a scanner
+>
+> SLICEisScope makes **one HTTP request per probe**, to the URL you specify,
+> from your own browser. It does not scan, crawl, or probe any host you did
+> not type into the address field. It is a client-side measurement tool, not
+> a network reconnaissance utility.
 
 ---
 
 ## Table of contents
 
-- [Why LatencyScope](#why-latencyscope)
+- [Why SLICEisScope](#why-sliceisscope)
+- [Why the name](#why-the-name)
+- [Part of the suite](#part-of-the-suite)
 - [Important: it is not ICMP ping](#important-it-is-not-icmp-ping)
 - [How the measurement works](#how-the-measurement-works)
 - [Architecture](#architecture)
@@ -35,7 +47,7 @@ build step, no dependencies beyond a browser and a CDN.
 
 ---
 
-## Why LatencyScope
+## Why SLICEisScope
 
 Most "ping" pages you find in a web search are broken in at least one of three
 ways:
@@ -47,7 +59,7 @@ ways:
    measurement all get plotted identically, which makes the numbers useless
    for diagnosing anything.
 
-LatencyScope is the fixed version of that entire genre:
+SLICEisScope is the fixed version of that entire genre:
 
 - **The address field is honored.** Type any `http(s)://` URL.
 - **The chart actually loads.** Modern `charts/loader.js`, not `jsapi.js`.
@@ -56,6 +68,56 @@ LatencyScope is the fixed version of that entire genre:
 - **Statistics you can act on.** Not just high/low — you get p50/p95/p99,
   jitter, average, and a running sample count.
 - **Data leaves with you.** One-click CSV export of every measurement.
+
+---
+
+## Why the name
+
+**SLICEisScope** is a phonetic expansion of the author's tag `SL_CE'I_`:
+
+| Form | Reading |
+|---|---|
+| `SL_CE'I_` | The tag — two underscores hide two letters |
+| `SLICE'IS` | Expanded — the hidden letters are **I** and **S** |
+| "Slice is" | Phonetic — reads as the English words |
+| **I**nternet **S**ecurity | What the hidden IS stands for |
+| SLICEisScope | The product — "Slice is Scope" |
+
+The GitHub slug is `SLICEisScope` (no apostrophe, no quotes) because GitHub
+only accepts alphanumerics, hyphens, underscores, and periods in repo URLs.
+Everywhere a human reads the name — title, badges, footer, docs — the full
+tag `SL_CE'I_` is preserved and linked to the author's profile.
+
+The tool was internally named **LatencyScope** during its v3.0.0 rewrite.
+The rename to SLICEisScope in v3.1.0 is identity-only: the source files
+(`index.html`, `main.js`), the measurement logic, the chart, the statistics,
+and the CSV export are all unchanged. Existing users keep their saved
+address and interval settings (auto-migrated from the old `localStorage` key).
+
+---
+
+## Part of the suite
+
+SLICEisScope is one of three defensive tools published under the `SL_CE'I_`
+handle. The naming convention ties them together:
+
+| Tool | Function | Repo |
+|---|---|---|
+| **SLICEisGuard** | WireGuard server installer and client manager | `github.com/DoTMob/SLICEisGuard` |
+| **SLICEisDeflate** | Connection-count based IP blocker (`ipset` + `iptables`) | `github.com/DoTMob/SLICEisDeflate` |
+| **SLICEisScope** | HTTP round-trip latency tester (this repo) | `github.com/DoTMob/SLICEisScope` |
+
+Each tool covers a distinct layer of the defense stack:
+
+- **SLICEisGuard** — the encrypted tunnel. Confirms traffic can flow privately.
+- **SLICEisDeflate** — the firewall. Drops abusive peers when they misbehave.
+- **SLICEisScope** — the measurement. Verifies what the user actually
+  experiences at the HTTP layer, not just what the kernel reports at the
+  network layer.
+
+Together they answer three questions: *is the path private, is the path
+protected, and is the path fast?* None of the three substitutes for the
+other two.
 
 ---
 
@@ -76,16 +138,18 @@ to "the browser reports the image is loaded." That number includes:
 | Body | download of the image bytes |
 | Browser | decode + paint-callback dispatch |
 
-That is why LatencyScope numbers are typically 20–100 ms higher than an ICMP
+That is why SLICEisScope numbers are typically 20–100 ms higher than an ICMP
 ping to the same host. It is a **full-stack round trip**, which is often the
 number you actually care about — but it is not a network-layer measurement.
 
-Use LatencyScope for:
+Use SLICEisScope for:
+
 - Verifying that a CDN is responding quickly from your browser
 - Comparing several endpoints from the same vantage point
 - Producing a CSV of HTTP RTT over time for a demo or an incident review
 
 Use your OS's `ping` (or `mtr`) for:
+
 - Network-layer latency and packet loss
 - Route diagnosis
 - Anything involving a router or ISP
@@ -98,18 +162,18 @@ Use your OS's `ping` (or `mtr`) for:
 sequenceDiagram
     participant U as User
     participant M as main.js
-    participant I as Image()
+    participant I as Image
     participant S as Remote server
 
-    U->>M: click Test / Start tick
-    M->>M: t0 = performance.now()
-    M->>I: img.src = url + "?_t=" + Date.now()
+    U->>M: click Test or Start tick
+    M->>M: t0 equals performance.now
+    M->>I: set img.src with cache-buster
     I->>S: DNS + TCP + TLS + HTTP GET
-    S-->>I: 200 OK + image bytes
-    I-->>M: onload (or onerror, or timeout)
-    M->>M: t1 = performance.now()
-    M->>M: record({ms: t1-t0, ok: outcome})
-    M->>U: update stats + chart
+    S-->>I: 200 OK and image bytes
+    I-->>M: onload or onerror or timeout
+    M->>M: t1 equals performance.now
+    M->>M: record ms = t1 minus t0 with ok flag
+    M->>U: update stats and chart
 ```
 
 Every probe uses a fresh cache-buster query string (`?_t=<timestamp>`), so the
@@ -129,27 +193,36 @@ discarded request.
 ```mermaid
 flowchart LR
     subgraph Page["index.html"]
-        UI["Bootstrap 5 stat cards<br/>+ chart + controls"]
+        UI["Bootstrap 5 stat cards<br/>chart controls presets"]
         LD["gstatic.com/charts/loader.js"]
         MJ["main.js"]
     end
 
-    subgraph State["main.js — IIFE"]
-        CFG["CONFIG<br/>intervals · limits · timeout"]
-        SM["state<br/>samples[] · chart · intervalId"]
-        PING["pingOnce(url)<br/>Promise · timeout · cache-buster"]
-        STAT["computeStats()<br/>min · max · avg · p50 · p95 · p99 · jitter"]
+    subgraph State["main.js IIFE"]
+        CFG["CONFIG<br/>intervals limits timeout<br/>storage keys"]
+        ID["IDENTITY<br/>name version author repo"]
+        SM["state<br/>samples chart intervalId"]
+        PING["pingOnce url<br/>Promise timeout cache-buster"]
+        STAT["computeStats<br/>min max avg p50 p95 p99 jitter"]
         CHART["Google Material Line<br/>rolling window"]
-        CSV["exportCsv()<br/>Blob → a[download]"]
+        CSV["exportCsv<br/>Blob and a download"]
+        BAN["printBanner<br/>console identity line"]
     end
 
     UI --> MJ
     LD --> MJ
-    MJ --> CFG --> SM
-    SM --> PING --> SM
-    SM --> STAT --> UI
-    SM --> CHART --> UI
-    SM --> CSV --> UI
+    MJ --> CFG
+    MJ --> ID
+    MJ --> SM
+    SM --> PING
+    PING --> SM
+    SM --> STAT
+    STAT --> UI
+    SM --> CHART
+    CHART --> UI
+    SM --> CSV
+    CSV --> UI
+    ID --> BAN
 ```
 
 ### State shape
@@ -188,10 +261,13 @@ Each sample is:
 | Rolling window | Stats and chart both cap at 200 samples (configurable) |
 | Timeout classification | Network error and timeout are distinct from success |
 | Settings persistence | Address and interval remembered via `localStorage` |
+| Backward compatibility | Reads the LatencyScope-era storage key on first load |
 | Keyboard shortcuts | Space / Esc / R |
 | Auto-pause on hidden tab | Stops probing when the tab goes to the background |
 | Responsive layout | Bootstrap 5 grid, mobile through desktop |
 | Accessibility | `<label for>` on inputs, `role="status"` on the badge, `aria-label` on the chart |
+| Console banner | One-line identity (`SLICEisScope v3.0.0 SL_CE'I_ <repo>`) on boot |
+| Author attribution | Visible in header, footer, and every badge |
 
 ---
 
@@ -228,11 +304,11 @@ average with 40 ms of jitter is not. Jitter is the metric that exposes that.
 | `main.js` | code | All probe logic, statistics, chart, persistence, export |
 | `README.md` | docs | This file |
 
-> **Note on `jsapi.js`:** The original project shipped a fourth file,
-> `jsapi.js`, containing Google's AJAX API loader from 2014. That API was
-> deprecated in 2019 and cannot load `google.charts.Line`. It has been
-> removed. The chart now loads via `https://www.gstatic.com/charts/loader.js`
-> from `index.html`.
+> **Note on `jsapi.js`:** The project this was forked from shipped a fourth
+> file, `jsapi.js`, containing Google's AJAX API loader from 2014. That API
+> was deprecated in 2019 and cannot load `google.charts.Line`. It has been
+> removed. The chart now loads via
+> `https://www.gstatic.com/charts/loader.js` from `index.html`.
 
 ---
 
@@ -284,7 +360,7 @@ will not freeze the browser.
 ### 5. Export
 
 Click **Export CSV** at any time while samples exist. The file is named
-`ping-<ISO timestamp>.csv` and contains one row per sample:
+`sliceisScope-<ISO timestamp>.csv` and contains one row per sample:
 
 ```csv
 sample,timestamp_iso,ms,ok
@@ -321,7 +397,8 @@ var CONFIG = {
     MAX_INTERVAL_MS: 60 * 60 * 1000, // ceiling (1 hour)
     MAX_SAMPLES: 200,                // rolling window for stats + chart
     PING_TIMEOUT_MS: 5000,           // per-probe timeout
-    STORAGE_KEY: 'pingTester.settings.v1'  // localStorage namespace
+    STORAGE_KEY: 'sliceisScope.settings.v1',
+    LEGACY_STORAGE_KEY: 'pingTester.settings.v1'
 };
 ```
 
@@ -334,8 +411,9 @@ Common changes:
 | A longer probe budget | Raise `PING_TIMEOUT_MS` (slows the whole loop) |
 | No persistence | Delete the `STORAGE_KEY` line or clear `localStorage` |
 
-The `localStorage` key is namespaced with a version suffix (`v1`), so changing
-the schema in a future version will not break existing users.
+The storage key is namespaced with a version suffix (`v1`), so changing the
+schema in a future version will not break existing users. The legacy key is
+read once to migrate LatencyScope-era settings, then never written again.
 
 ---
 
@@ -352,6 +430,9 @@ the schema in a future version will not break existing users.
 - **`localStorage`** stores only `{ address, time }` — never samples.
 - **No `eval`, no `innerHTML` with user data.** All dynamic text goes through
   `textContent` or Bootstrap's DOM APIs.
+- **Cache-buster query strings** are the only way probes are identified —
+  they contain a millisecond timestamp in base 36 and nothing else. No
+  cookies, no fingerprinting, no correlation across pages.
 
 ### A note on `file://` usage
 
@@ -377,21 +458,48 @@ static host is the supported path.
 - **Chart library requires network.** If `gstatic.com` is unreachable, the
   chart cannot load; the page reports this as a status error rather than
   silently failing.
+- **Precision is browser-bound.** `performance.now()` is coarsened for
+  fingerprinting resistance (typically to 100 µs–1 ms depending on browser).
+  For sub-millisecond work, use `curl -w` or a dedicated tool.
 
 ---
 
 ## Changelog
 
-### v3.0.0 — first release under the LatencyScope name
+### v3.1.0 — first release under the SLICEisScope name
 
-**Two functional bugs fixed:**
+> **Renaming note (identity-only):** The tool was internally named
+> **LatencyScope** during its v3.0.0 rewrite and is now published as
+> **SLICEisScope** to fit the `SL_CE'I_` suite naming convention. No
+> functional changes.
+>
+> **Renamed:**
+> - Title, header, and footer: `Ping Tester` / `LatencyScope` → `SLICEisScope`
+> - `<title>` tag and `<meta name="description">`
+> - `localStorage` key: `pingTester.settings.v1` → `sliceisScope.settings.v1`
+> - Chart title: `Latency (ms)` → `SLICEisScope — latency (ms)`
+> - CSV filename: `ping-<ts>.csv` → `sliceisScope-<ts>.csv`
+> - Added `IDENTITY` constant and console banner on boot
+>
+> **Unchanged:** every function, event binding, calculation, timeout,
+> shortcut, and button-state transition. The `main.js` diff for this release
+> touches only the header comment, the `CONFIG` object (storage keys), the
+> chart title string, the CSV filename string, and the new
+> `IDENTITY`/`printBanner()` pair.
+>
+> **Backward compatibility:** existing LatencyScope users have their saved
+> `address` and `interval` migrated on first load. No action required.
+
+### v3.0.0 — the rewrite that fixed the original
+
+Two functional bugs fixed:
 
 | # | Bug (original) | Fix |
 |---|---|---|
 | 1 | `test()` ignored the Address field and always pinged `facebook.com` | Address is validated and honored; presets are explicit buttons |
 | 2 | Chart loaded `jsapi.js` (Google AJAX API, deprecated 2019) which cannot instantiate `google.charts.Line` | Loads `https://www.gstatic.com/charts/loader.js`; `jsapi.js` removed |
 
-**Thirty enhancements, grouped:**
+Thirty enhancements, grouped:
 
 - **Correctness** — `performance.now()` instead of `Date.getTime()`; timeout
   and error are distinct from success; per-probe `setTimeout` is now cleared;
@@ -409,14 +517,17 @@ static host is the supported path.
 - **Robustness** — IIFE scope, `'use strict'`, no global `Array.prototype`
   pollution, `beforeunload` cleanup, CSP meta tag, SRI on CDN assets.
 
-**Files:**
+---
 
-| File | Change |
-|---|---|
-| `index.html` | rewrite — doctype, CSP, SRI, Bootstrap 5, responsive stat grid, presets, footer |
-| `main.js` | rewrite — full probe/stats/chart/export pipeline in a scoped IIFE |
-| `jsapi.js` | **deleted** — replaced by `gstatic.com/charts/loader.js` |
-| `README.md` | new — this file |
+## Credits
+
+The measurement technique — load an image and time it — is decades old and
+has been described in many places; the
+[Stack Overflow question on JS ping](https://stackoverflow.com/questions/4282151/is-it-possible-to-ping-a-server-from-javascript)
+is the most-linked reference. The chart library is
+[Google Charts](https://developers.google.com/chart), loaded from
+`gstatic.com`. The UI framework is
+[Bootstrap 5](https://getbootstrap.com).
 
 ---
 
@@ -427,6 +538,6 @@ MIT — see `LICENSE`. Choose and commit a license file before publishing.
 ---
 
 <p align="center">
-  <strong>LatencyScope</strong> — HTTP round-trip, measured honestly.<br/>
-  <sub>Maintained by <code>SL_CE"I_"</code> · MIT License</sub>
+  <strong>SLICEisScope</strong> — HTTP round-trip, measured honestly.<br/>
+  <sub>Maintained by <a href="https://github.com/DoTMob/"><code>SL_CE'I_</code></a> · MIT License</sub>
 </p>
