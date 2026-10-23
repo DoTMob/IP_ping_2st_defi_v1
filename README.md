@@ -6,7 +6,7 @@ Measure the time it takes a browser to fetch a remote resource, watch the
 latency curve update live, and export every sample as CSV — no server, no
 build step, no dependencies beyond a browser and a CDN.
 
-**Maintained by [`SL_CE"I_"`](https://github.com/)**
+**Maintained by [`D0T_SL_CE"I_"`](https://github.com/)**
 
 [![Version](https://img.shields.io/badge/version-3.0.0-blue.svg)](#changelog)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](#license)
